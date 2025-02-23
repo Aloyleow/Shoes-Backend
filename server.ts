@@ -2,7 +2,10 @@ import express, {type Application} from "express";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
-import testRouter from "./controllers/uploadShoes"
+import uploadShoes from "./controllers/uploadShoes"
+import shoeTypes from "./controllers/shoeTypes"
+import shoeBrands from "./controllers/shoeBrands"
+import shoeSize from "./controllers/shoeSizes"
 
 dotenv.config();
 
@@ -14,7 +17,12 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use("/api", testRouter)
+app.use("/api", 
+  uploadShoes,
+  shoeTypes,
+  shoeBrands,
+  shoeSize
+)
 
 app.listen(port, () => {
   console.log(`Shoes on port ${port}`)

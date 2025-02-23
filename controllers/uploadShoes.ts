@@ -20,7 +20,7 @@ const uploadShoesSchema = z.object({
 
 type UploadShoes = z.infer<typeof uploadShoesSchema>;
 
-router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {}, UploadShoes>, res: Response) => {
+router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {}, UploadShoes>, res: Response<"Success"| "Success w/o Image" | { error: string }>) => {
 
   const bucketName = process.env.BUCKET_NAME;
 
@@ -101,9 +101,11 @@ router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {},
 
       res.status(201).json("Success");
 
-    }
+    } else {
 
-    res.status(201).json("Success w/o Image");
+      res.status(201).json("Success w/o Image");
+
+    }
 
 
   } catch (error: unknown){
