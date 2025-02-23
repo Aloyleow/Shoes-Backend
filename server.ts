@@ -6,6 +6,7 @@ import uploadShoes from "./controllers/uploadShoes"
 import shoeTypes from "./controllers/shoeTypes"
 import shoeBrands from "./controllers/shoeBrands"
 import shoeSize from "./controllers/shoeSizes"
+import displayShoes from "./controllers/displayShoes"
 
 dotenv.config();
 
@@ -21,7 +22,8 @@ app.use("/api",
   uploadShoes,
   shoeTypes,
   shoeBrands,
-  shoeSize
+  shoeSize,
+  displayShoes
 )
 
 app.listen(port, () => {

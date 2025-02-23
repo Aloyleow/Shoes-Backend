@@ -88,7 +88,7 @@ router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {},
 
       const awsParams = {
         Bucket: bucketName,
-        Key: upload.rows[0].brandid,
+        Key: `$upload.rows[0].brandid`,
         Body: req.file?.buffer,
         ContentType: req.file?.mimetype
       }
