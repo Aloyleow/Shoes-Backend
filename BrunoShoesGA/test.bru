@@ -5,7 +5,13 @@ meta {
 }
 
 post {
-  url: /api/test
-  body: none
+  url: http://localhost:8888/api/test
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "brandname": 4
+  }
 }

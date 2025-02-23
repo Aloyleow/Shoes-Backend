@@ -68,7 +68,7 @@ const eidtShoeTypeSchema = z.object({
 
 type EditShoeType = z.infer<typeof eidtShoeTypeSchema>
 
-router.put("/shoetype", async(req: Request<{}, {}, EditShoeType>, res: Response) => {
+router.put("/shoetype", async(req: Request<{}, {}, EditShoeType>, res: Response<"Success" | { error: string }>) => {
 
   const dataUpload = `
   UPDATE shoetypes
@@ -83,7 +83,7 @@ router.put("/shoetype", async(req: Request<{}, {}, EditShoeType>, res: Response)
 
   try {
 
-    const validateReqBody = shoeTypeSchema.safeParse(req.body);
+    const validateReqBody = eidtShoeTypeSchema.safeParse(req.body);
     if (!validateReqBody.success) {
       const validateError = validateReqBody.error.issues.map(item => `${item.path}: ${item.message}`);
       throw new Error(`Validation type failed ${validateError}`);
@@ -122,6 +122,45 @@ router.put("/shoetype", async(req: Request<{}, {}, EditShoeType>, res: Response)
     
   }
 
+
+})
+
+const displayShoeTypeSchema = z.array(z.object({
+  typeid: z.number(),
+  typename: z.string().max(30),
+}))
+
+type DisplayShoeType = z.infer<typeof displayShoeTypeSchema>
+
+router.get("/shoetype", async(req: Request, res: Response<DisplayShoeType | {error: string}>) => {
+
+  const queryData = `
+  SELECT * 
+  FROM shoetypes
+  `;
+
+  try {
+
+    const checkData = await pool.query(queryData);
+    if (!checkData) {
+      throw new Error("PG Database Error.");
+    }
+    
+    res.status(200).json(checkData.rows)
+    
+  } catch (error: unknown) {
+
+    if (error instanceof Error) {
+
+      res.status(400).json({ error: error.message });
+
+    } else {
+
+      res.status(500).json({ error: "Internal server error" });
+
+    }
+    
+  }
 
 })
 

@@ -83,7 +83,7 @@ router.put("/shoebrand", async(req: Request<{}, {}, EditShoeBrand>, res: Respons
 
   try {
 
-    const validateReqBody = shoeBrandSchema.safeParse(req.body);
+    const validateReqBody = editShoeBrandSchema.safeParse(req.body);
     if (!validateReqBody.success) {
       const validateError = validateReqBody.error.issues.map(item => `${item.path}: ${item.message}`);
       throw new Error(`Validation type failed ${validateError}`);
@@ -124,6 +124,46 @@ router.put("/shoebrand", async(req: Request<{}, {}, EditShoeBrand>, res: Respons
 
 
 })
+
+const displayShoeBrandSchema = z.array(z.object({
+  brandid: z.number(),
+  brandname: z.string().max(30)
+}))
+
+type DisplayShoeBrand = z.infer<typeof displayShoeBrandSchema>
+
+router.get("/shoebrand", async(req: Request, res: Response<DisplayShoeBrand | {error: string}>) => {
+
+  const queryData = `
+  SELECT * 
+  FROM brands
+  `;
+
+  try {
+
+    const checkData = await pool.query(queryData);
+    if (!checkData) {
+      throw new Error("PG Database Error.");
+    }
+    
+    res.status(200).json(checkData.rows)
+    
+  } catch (error: unknown) {
+
+    if (error instanceof Error) {
+
+      res.status(400).json({ error: error.message });
+
+    } else {
+
+      res.status(500).json({ error: "Internal server error" });
+
+    }
+    
+  }
+
+})
+
 
 
 export default router
