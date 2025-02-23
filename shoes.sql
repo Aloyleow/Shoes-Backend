@@ -1,5 +1,5 @@
 CREATE TABLE
-  Shoes (
+  shoes (
     shoesId SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     typeId INT NOT NULL REFERENCES ShoeTypes(typeId),
@@ -12,7 +12,7 @@ CREATE TABLE
   )
   
 CREATE TABLE
-  ShoeTypes (
+  shoetypes (
     typeId SERIAL PRIMARY KEY,
     typeName VARCHAR(30) NOT NULL UNIQUE CHECK (typeName <> '')
   )
@@ -24,14 +24,14 @@ CREATE TABLE
   )
 
 CREATE TABLE
-  Sizes (
+  sizes (
     sizeId SERIAL PRIMARY KEY,
     sizeCountry VARCHAR(5) NOT NULL CHECK (sizeCountry IN ('US', 'UK', 'EURO')),
     sizeNumber DECIMAL(3,1) NOT NULL UNIQUE CHECK (sizeNumber <> 0)
   )
 
 CREATE TABLE
-  Sales (
+  sales (
     salesId SERIAL PRIMARY KEY,
     shoesId INT NOT NULL REFERENCES Shoes(shoesId),
     salePrice DECIMAL(9,2) NOT NULL,
