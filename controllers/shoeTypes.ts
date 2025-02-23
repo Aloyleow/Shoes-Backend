@@ -10,7 +10,7 @@ const shoeTypeSchema = z.object({
 
 type ShoeType = z.infer<typeof shoeTypeSchema>
 
-router.post("/shoetype", async(req: Request<{}, {}, ShoeType>, res: Response) => {
+router.post("/shoetype", async(req: Request<{}, {}, ShoeType>, res: Response<"Success" | { error: string }>) => {
 
   const dataUpload = `
   INSERT INTO shoetypes (typename)
@@ -47,7 +47,72 @@ router.post("/shoetype", async(req: Request<{}, {}, ShoeType>, res: Response) =>
 
     if (error instanceof Error) {
 
-      res.status(500).json({ error: error.message });
+      res.status(400).json({ error: error.message });
+
+    } else {
+
+      res.status(500).json({ error: "Internal server error" });
+
+    }
+    
+  }
+
+
+})
+
+const eidtShoeTypeSchema = z.object({
+  newtypename: z.string().max(30),
+  typeid: z.number(),
+  typename: z.string().max(30),
+});
+
+type EditShoeType = z.infer<typeof eidtShoeTypeSchema>
+
+router.put("/shoetype", async(req: Request<{}, {}, EditShoeType>, res: Response) => {
+
+  const dataUpload = `
+  UPDATE shoetypes
+  SET typename = $1
+  WHERE typeid = $2 AND typename = $3
+  `
+  const queryType = `
+  SELECT *
+  FROM shoetypes
+  WHERE typename = $1
+  `
+
+  try {
+
+    const validateReqBody = shoeTypeSchema.safeParse(req.body);
+    if (!validateReqBody.success) {
+      const validateError = validateReqBody.error.issues.map(item => `${item.path}: ${item.message}`);
+      throw new Error(`Validation type failed ${validateError}`);
+    }
+
+    const checkType = await pool.query(queryType, [req.body.newtypename]);
+    if (checkType.rowCount !== 0) {
+      throw new Error("Shoe type already exist.");
+    }
+
+    const dataInput = [
+      req.body.newtypename,
+      req.body.typeid,
+      req.body.typename
+    ]
+
+    const upload = await pool.query(dataUpload, dataInput);
+    if (!upload) {
+      throw new Error("PG Database Error.");
+    }
+
+    res.status(200).json("Success")
+
+    
+  } catch (error: unknown) {
+
+    if (error instanceof Error) {
+
+      res.status(400).json({ error: error.message });
 
     } else {
 
