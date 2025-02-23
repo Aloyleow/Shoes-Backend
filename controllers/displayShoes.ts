@@ -57,7 +57,7 @@ router.get("/display", async (req: Request, res: Response<DisplayShoesData | { e
         
         const pictureParams = {
           Bucket: process.env.BUCKET_NAME,
-          Key: `$item.shoesid`
+          Key: `${item.shoesid}`
         }
 
         const command = new GetObjectCommand(pictureParams)
