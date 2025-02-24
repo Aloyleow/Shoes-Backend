@@ -7,7 +7,7 @@ import pool from "../services/pool";
 
 const router = express.Router();
 
-const uploadShoesSchema = z.object({
+const uploadShoeSchema = z.object({
   name: z.string(),
   typeid: z.number(),
   brandid: z.number(),
@@ -18,9 +18,15 @@ const uploadShoesSchema = z.object({
   picture: z.boolean(),
 });
 
-type UploadShoes = z.infer<typeof uploadShoesSchema>;
+type UploadShoe = z.infer<typeof uploadShoeSchema>;
 
-router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {}, UploadShoes>, res: Response<"Success"| "Success w/o Image" | { error: string }>) => {
+const formDataSchema = z.object({
+  shoedata: z.string(),
+})
+
+type FormDataCheck = z.infer<typeof formDataSchema>;
+
+router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {}, FormDataCheck>, res: Response<"Success"| "Success w/o Image" | { error: string }>) => {
 
   const bucketName = process.env.BUCKET_NAME;
 
@@ -47,36 +53,38 @@ router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {},
 
   try {
 
-    const validateReqBody = uploadShoesSchema.safeParse(req.body);
+    const parsedData: UploadShoe = JSON.parse(req.body.shoedata);
+    
+    const validateReqBody = uploadShoeSchema.safeParse(req.body);
     if (!validateReqBody.success) {
       const validateError = validateReqBody.error.issues.map(item => `${item.path}: ${item.message}`);
       throw new Error(`Validation type failed ${validateError}`);
     }
 
-    const checkType = await pool.query(queryType, [req.body.typeid]);
+    const checkType = await pool.query(queryType, [parsedData.typeid]);
     if (checkType.rowCount === 0 || !checkType) {
       throw new Error("Shoe Type does not exist.");
     }
 
-    const checkBrand = await pool.query(queryBrand, [req.body.brandid]);
+    const checkBrand = await pool.query(queryBrand, [parsedData.brandid]);
     if (checkBrand.rowCount === 0 || !checkBrand) {
       throw new Error("Shoe Brand does not exist.");
     }
 
-    const checkSize = await pool.query(querySize, [req.body.sizeid]);
+    const checkSize = await pool.query(querySize, [parsedData.sizeid]);
     if (checkSize.rowCount === 0 || !checkSize) {
       throw new Error("Shoe Size does not exist.");
     }
 
     const dataInput = [
-      req.body.name,
-      req.body.typeid,
-      req.body.brandid,
-      req.body.sizeid,
-      req.body.colour,
-      req.body.miscellaneous,
-      req.body.costprice,
-      req.body.picture
+      parsedData.name,
+      parsedData.typeid,
+      parsedData.brandid,
+      parsedData.sizeid,
+      parsedData.colour,
+      parsedData.miscellaneous,
+      parsedData.costprice,
+      parsedData.picture
     ]
 
     const upload = await pool.query(dataUpload, dataInput);
@@ -84,7 +92,7 @@ router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {},
       throw new Error("PG Database Error.");
     }
 
-    if (req.body.picture) {
+    if (parsedData.picture) {
 
       const awsParams = {
         Bucket: bucketName,
