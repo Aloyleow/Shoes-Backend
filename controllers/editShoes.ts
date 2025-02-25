@@ -36,8 +36,8 @@ router.put("/display/shoe", async (req: Request<{}, {}, EditShoe>, res: Response
     }
 
     const checkShoe = await pool.query(queryShoes, [req.body.shoesid]);
-    if (checkShoe.rowCount !== 0) {
-      throw new Error("Shoe size already exist.");
+    if (checkShoe.rowCount !== 1) {
+      throw new Error("Shoe not in Data.");
     }
 
     const dataInput = [
