@@ -55,7 +55,7 @@ router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {},
 
     const parsedData: UploadShoe = JSON.parse(req.body.shoedata);
     
-    const validateReqBody = uploadShoeSchema.safeParse(req.body);
+    const validateReqBody = uploadShoeSchema.safeParse(parsedData);
     if (!validateReqBody.success) {
       const validateError = validateReqBody.error.issues.map(item => `${item.path}: ${item.message}`);
       throw new Error(`Validation type failed ${validateError}`);
@@ -96,7 +96,7 @@ router.post("/upload", saveImage.single('imageAWS'), async (req: Request<{}, {},
 
       const awsParams = {
         Bucket: bucketName,
-        Key: `${upload.rows[0].brandid}`,
+        Key: `${upload.rows[0].shoesid}`,
         Body: req.file?.buffer,
         ContentType: req.file?.mimetype
       }
