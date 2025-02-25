@@ -9,6 +9,7 @@ import shoeBrands from "./controllers/shoeBrands"
 import shoeSize from "./controllers/shoeSizes"
 import displayShoes from "./controllers/displayShoes"
 import deleteShoes from "./controllers/deleteShoes"
+import editShoes from "./controllers/editShoes"
 
 types.setTypeParser(1700, (val) => {
   return parseFloat(val);
@@ -29,7 +30,8 @@ app.use("/api",
   shoeBrands,
   shoeSize,
   displayShoes,
-  deleteShoes
+  deleteShoes,
+  editShoes
 )
 
 app.listen(port, () => {

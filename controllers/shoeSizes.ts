@@ -18,7 +18,7 @@ router.post("/shoesize", async(req: Request<{}, {}, ShoeSize>, res: Response<"Su
   INSERT INTO sizes (sizecountry, sizenumber)
   VALUES ($1, $2)
   `
-  const queryType = `
+  const querySizes = `
   SELECT *
   FROM sizes
   WHERE sizecountry = $1 AND sizenumber = $2
@@ -37,7 +37,7 @@ router.post("/shoesize", async(req: Request<{}, {}, ShoeSize>, res: Response<"Su
       req.body.sizenumber
     ]
 
-    const checkType = await pool.query(queryType, dataInput);
+    const checkType = await pool.query(querySizes, dataInput);
     if (checkType.rowCount !== 0) {
       throw new Error("Shoe size already exist.");
     }
@@ -84,7 +84,7 @@ router.put("/shoesize", async(req: Request<{}, {}, EditShoeSize>, res: Response<
   SET sizecountry = $1, sizenumber = $2
   WHERE sizeid = $3 AND sizecountry = $4 AND sizenumber = $5
   `
-  const queryType = `
+  const querySizes = `
   SELECT *
   FROM sizes
   WHERE sizecountry = $1 AND sizenumber = $2
@@ -98,7 +98,7 @@ router.put("/shoesize", async(req: Request<{}, {}, EditShoeSize>, res: Response<
       throw new Error(`Validation type failed ${validateError}`);
     }
 
-    const checkType = await pool.query(queryType, [req.body.newsizecountry, req.body.newsizenumber]);
+    const checkType = await pool.query(querySizes, [req.body.newsizecountry, req.body.newsizenumber]);
     if (checkType.rowCount !== 0) {
       throw new Error("Shoe size already exist.");
     }
