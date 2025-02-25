@@ -1,4 +1,5 @@
 import express, {type Application} from "express";
+import { types } from "pg";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -9,6 +10,9 @@ import shoeSize from "./controllers/shoeSizes"
 import displayShoes from "./controllers/displayShoes"
 import deleteShoes from "./controllers/deleteShoes"
 
+types.setTypeParser(1700, (val) => {
+  return parseFloat(val);
+});
 dotenv.config();
 
 const app: Application = express();
